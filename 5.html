@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вкус Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        a{
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 10px 0;
+            background-color: #f2f2f2;
+            padding: 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .options li:hover {
+            background-color: #e2e2e2;
+        }
+        .correct-answer {
+            color: green;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        .incorrect-answer {
+            color: red;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        .next-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .next-btn:hover {
+            background-color: #45a049;
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html">На главную</a>
+    <div class="question">Какой вкус?</div>
+    <ul class="options">
+    </ul>
+    <div class="correct-answer"></div>
+    <div class="incorrect-answer"></div>
+    <button class="next-btn" onclick="nextQuestion()">Следующий вопрос</button>
+    <div class="result"></div>
+
+    <script>
+ const data = [
+  { flavor: "Lemon Tonic", taste: "Лимонный Тоник" },
+  { flavor: "Mad Pear", taste: "Сочная груша" },
+  { flavor: "Mandarin", taste: "Мандарин" },
+  { flavor: "Mango Sling", taste: "Манго" },
+  { flavor: "Maple Pecan", taste: "Слоёное тесто с кленовым сиропом и орехом сорта пекан" },
+  { flavor: "Marula", taste: "Африканская слива" },
+  { flavor: "Masala Tea", taste: "Сливочный чай со специями" },
+  { flavor: "Melonade", taste: "Арбузно дынный лимонад с барбарисом" },
+  { flavor: "Milk Oolong", taste: "Молочный улун" },
+  { flavor: "Milky Rise", taste: "Рисовая каша" },
+  { flavor: "Morocco", taste: "Марокканский апельсиновый чай со специями" },
+  { flavor: "Mulled Wine", taste: "Глинтвейн" },
+  { flavor: "Nord Star", taste: "Вишня сорта норд стар" },
+  { flavor: "Orange Team", taste: "Мандарин апельсин (сладкие цитрусы)" },
+  { flavor: "Paradise", taste: "Банан кокос карамель" },
+  { flavor: "Passion Plum", taste: "Маракуйя Слива" },
+  { flavor: "Peppermint", taste: "Перечная мята" },
+  { flavor: "Pearl Pool", taste: "Мусс из Ананас Манго Марула Маракуйя и Моринга" },
+  { flavor: "Pineapple Rings", taste: "Ананасовые кольца" },
+  { flavor: "Pinkman", taste: "Грейпфрут Клубника Малина" },
+  { flavor: "Pistachio", taste: "Фисташки" },
+  { flavor: "Pistachio Cake", taste: "Пирог из фисташек" },
+  { flavor: "Prosecco", taste: "Игристое полусухое вино" },
+  { flavor: "Quince", taste: "Айва" },
+  { flavor: "Raspberry", taste: "Малина" },
+  { flavor: "Red Bomb", taste: "Гранат" },
+  { flavor: "Red Tea", taste: "Чай каркаде" },
+  { flavor: "Rocketman", taste: "Клубника Киви Грейпфрут" },
+  { flavor: "Ruby Grape", taste: "Рубиновый виноград" },
+  { flavor: "Sea Buckthorn tea", taste: "Облепиховый чай" },
+  { flavor: "Space Flavour", taste: "Полевые цветы роза манго маракуйя личи" },
+  { flavor: "Sour Apple", taste: "Кислое Яблоко" },
+  { flavor: "Sour Berries", taste: "Кислая Малина Красная смородина" },
+  { flavor: "Sour Tropic", taste: "Кислый ананас маракуйя" },
+  { flavor: "StrawBerry", taste: "Клубника" },
+  { flavor: "StrawBerry-Lychee", taste: "Земляника личи" },
+  { flavor: "Sweet Melon", taste: "Спелая дыня" },
+  { flavor: "Sweet Peach", taste: "Сладкий персик" },
+  { flavor: "Tropic Juice", taste: "Ананас маракуйя" },
+  { flavor: "Tipsy", taste: "Ром Арбуз Сливки Ягоды" },
+  { flavor: "Vanilla cream", taste: "Ванильный крем" },
+  { flavor: "Violet", taste: "Дыня черника сливки" },
+  { flavor: "Unicorn Treats", taste: "Кукурузные палочки с маршмеллоу" },
+  { flavor: "Watermelon", taste: "Арбуз" },
+  { flavor: "Yolka", taste: "Хвоя" }
+];
+
+
+        function shuffleQuestions(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        shuffleQuestions(data);
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function getRandomQuestion() {
+            const questionData = data[currentQuestionIndex];
+            const correctAnswer = questionData.taste;
+
+            let wrongAnswers = [];
+            while (wrongAnswers.length < 3) {
+                const randomData = data[Math.floor(Math.random() * data.length)];
+                if (wrongAnswers.indexOf(randomData.taste) === -1 && randomData.taste !== correctAnswer) {
+                    wrongAnswers.push(randomData.taste);
+                }
+            }
+
+            const allAnswers = [correctAnswer, ...wrongAnswers];
+            allAnswers.sort(() => Math.random() - 0.5);
+
+            return {
+                question: questionData.flavor,
+                correctAnswer: correctAnswer,
+                allAnswers: allAnswers
+            };
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= data.length) {
+                displayResult();
+                return;
+            }
+
+            document.querySelector('.correct-answer').style.display = 'none';
+            document.querySelector('.incorrect-answer').style.display = 'none';
+
+            const { question, correctAnswer, allAnswers } = getRandomQuestion();
+
+
+            document.querySelector('.question').textContent = `Какой вкус для "${question}"?`;
+
+
+            const optionsList = document.querySelector('.options');
+            optionsList.innerHTML = '';
+
+            allAnswers.forEach(answer => {
+                const li = document.createElement('li');
+                li.textContent = answer;
+                li.addEventListener('click', () => showCorrectAnswer(answer, correctAnswer));
+                optionsList.appendChild(li);
+            });
+        }
+
+        function showCorrectAnswer(selectedAnswer, correctAnswer) {
+            const correctAnswerDiv = document.querySelector('.correct-answer');
+            const incorrectAnswerDiv = document.querySelector('.incorrect-answer');
+
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                correctAnswerDiv.textContent = `Правильный ответ: ${correctAnswer}`;
+                correctAnswerDiv.style.color = 'green';
+                correctAnswerDiv.style.display = 'block';
+            } else {
+                incorrectAnswerDiv.textContent = `Неправильный ответ! Правильный: ${correctAnswer}`;
+                incorrectAnswerDiv.style.color = 'red';
+                incorrectAnswerDiv.style.display = 'block';
+            }
+
+
+            const options = document.querySelectorAll('.options li');
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+
+            document.querySelector('.next-btn').style.display = 'inline-block'; 
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+            document.querySelector('.next-btn').style.display = 'none'; 
+        }
+
+        function displayResult() {
+            document.querySelector('.question').style.display = 'none';
+            document.querySelector('.options').style.display = 'none';
+            document.querySelector('.next-btn').style.display = 'none';
+
+            const resultDiv = document.querySelector('.result');
+            resultDiv.textContent = `Вы ответили правильно на ${score} из ${data.length} вопросов!`;
+        }
+
+        displayQuestion();
+    </script>
+</body>
+</html>
+
+
+
+
+
+

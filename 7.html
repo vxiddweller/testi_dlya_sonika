@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вкус Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        a{
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 10px 0;
+            background-color: #f2f2f2;
+            padding: 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .options li:hover {
+            background-color: #e2e2e2;
+        }
+        .correct-answer {
+            color: green;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        .incorrect-answer {
+            color: red;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        .next-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .next-btn:hover {
+            background-color: #45a049;
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html">На главную</a>
+    <div class="question">Какой вкус?</div>
+    <ul class="options">
+    </ul>
+    <div class="correct-answer"></div>
+    <div class="incorrect-answer"></div>
+    <button class="next-btn" onclick="nextQuestion()">Следующий вопрос</button>
+    <div class="result"></div>
+
+    <script>
+ const data = [
+  { flavor: "Maibu", taste: "Клубника сливки (Конфеты малибу)" },
+  { flavor: "Melon halls", taste: "Дынный холс" },
+  { flavor: "Mirinda", taste: "Газировка миринда с апельсином" },
+  { flavor: "Muesli", taste: "Фруктовые мюсли" },
+  { flavor: "Nutella", taste: "Шоколадная паста с орехом" },
+  { flavor: "Overdose", taste: "Лимон лайм" },
+  { flavor: "Papaya v obed", taste: "Папайя" },
+  { flavor: "Peach killer", taste: "Бархатный персик" },
+  { flavor: "Peach yogurt", taste: "Персиковый йогурт" },
+  { flavor: "Peach berry", taste: "Персик земляника" },
+  { flavor: "Pear lemonade", taste: "Грушевый лимонад" },
+  { flavor: "Pina colada", taste: "Пинаколада (Ананас-кокос)" },
+  { flavor: "Pineapple", taste: "Ананас" },
+  { flavor: "Pistachio ice snow", taste: "Фисташковое мороженое" },
+  { flavor: "Pudding", taste: "Пудинг" },
+  { flavor: "Raspberries", taste: "Лесная малина" },
+  { flavor: "Raspberry shock", taste: "Кислая малина" },
+  { flavor: "Real P.F.", taste: "Маракуйя" },
+  { flavor: "Red orange", taste: "Красный апельсин" },
+  { flavor: "Rising star", taste: "Манго-маракуйя" },
+  { flavor: "Shock currant shock", taste: "Кислая красная смородина" },
+  { flavor: "Siberian soda", taste: "Сибирский лимонад" },
+  { flavor: "Something berry", taste: "Садовые ягоды арбузом и лимоном" },
+  { flavor: "Something sweet", taste: "Варенье из фейхоа с абрикосом" },
+  { flavor: "Something tropical", taste: "Тропический микс" },
+  { flavor: "Soo sep", taste: "Сметанное яблоко (похоже на ананас)" },
+  { flavor: "Strawberry coconut", taste: "Клубника кокос экзаплит" },
+  { flavor: "Strawberry jam", taste: "Клубничный джем" },
+  { flavor: "Summer Bucket", taste: "Ягодная корзина" },
+  { flavor: "Sunday sun", taste: "Цитрусовый микс" },
+  { flavor: "Tik tak", taste: "Апельсиновый тик так" },
+  { flavor: "Tropic jack", taste: "Спелый джекфрут" },
+  { flavor: "Watermelon", taste: "Арбуз" },
+  { flavor: "На расслабоне", taste: "Банановое суфле" },
+  { flavor: "На чилле", taste: "Тропический сок" }
+];
+
+
+
+        function shuffleQuestions(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        shuffleQuestions(data);
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function getRandomQuestion() {
+            const questionData = data[currentQuestionIndex];
+            const correctAnswer = questionData.taste;
+
+            let wrongAnswers = [];
+            while (wrongAnswers.length < 3) {
+                const randomData = data[Math.floor(Math.random() * data.length)];
+                if (wrongAnswers.indexOf(randomData.taste) === -1 && randomData.taste !== correctAnswer) {
+                    wrongAnswers.push(randomData.taste);
+                }
+            }
+
+            const allAnswers = [correctAnswer, ...wrongAnswers];
+            allAnswers.sort(() => Math.random() - 0.5);
+
+            return {
+                question: questionData.flavor,
+                correctAnswer: correctAnswer,
+                allAnswers: allAnswers
+            };
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= data.length) {
+                displayResult();
+                return;
+            }
+
+            document.querySelector('.correct-answer').style.display = 'none';
+            document.querySelector('.incorrect-answer').style.display = 'none';
+
+            const { question, correctAnswer, allAnswers } = getRandomQuestion();
+
+
+            document.querySelector('.question').textContent = `Какой вкус для "${question}"?`;
+
+
+            const optionsList = document.querySelector('.options');
+            optionsList.innerHTML = '';
+
+            allAnswers.forEach(answer => {
+                const li = document.createElement('li');
+                li.textContent = answer;
+                li.addEventListener('click', () => showCorrectAnswer(answer, correctAnswer));
+                optionsList.appendChild(li);
+            });
+        }
+
+        function showCorrectAnswer(selectedAnswer, correctAnswer) {
+            const correctAnswerDiv = document.querySelector('.correct-answer');
+            const incorrectAnswerDiv = document.querySelector('.incorrect-answer');
+
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                correctAnswerDiv.textContent = `Правильный ответ: ${correctAnswer}`;
+                correctAnswerDiv.style.color = 'green';
+                correctAnswerDiv.style.display = 'block';
+            } else {
+                incorrectAnswerDiv.textContent = `Неправильный ответ! Правильный: ${correctAnswer}`;
+                incorrectAnswerDiv.style.color = 'red';
+                incorrectAnswerDiv.style.display = 'block';
+            }
+
+
+            const options = document.querySelectorAll('.options li');
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+
+            document.querySelector('.next-btn').style.display = 'inline-block'; 
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+            document.querySelector('.next-btn').style.display = 'none'; 
+        }
+
+        function displayResult() {
+            document.querySelector('.question').style.display = 'none';
+            document.querySelector('.options').style.display = 'none';
+            document.querySelector('.next-btn').style.display = 'none';
+
+            const resultDiv = document.querySelector('.result');
+            resultDiv.textContent = `Вы ответили правильно на ${score} из ${data.length} вопросов!`;
+        }
+
+        displayQuestion();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
